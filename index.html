@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Didático - Árvore AVL de Criptografia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>🔒 SecureCore Enterprise</h1>
+    <p>Simulador Didático de Criptografia via Árvore Auto-Balanceada (AVL) (Até 100 Caracteres)</p>
+  </header>
+
+  <main class="container">
+    <!-- CONTROLES DE ENTRADA -->
+    <section class="card control-panel" id="section-controls">
+      <h2>1. Configuração da Mensagem (Até 100 caracteres)</h2>
+      
+      <div class="mode-selector-group">
+        <span class="mode-label">Modo de Operação:</span>
+        <div class="segmented-control">
+          <button type="button" class="btn-mode active" data-mode="encrypt">🔒 Criptografar</button>
+          <button type="button" class="btn-mode" data-mode="decrypt">🔓 Descriptografar</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="flex-row">
+          <input type="text" id="input-text" value="Estrutura de Dados #2026!" maxlength="100" placeholder="Digite caracteres, números ou texto cifrado Base64...">
+          <button id="btn-paste" class="btn btn-secondary" title="Colar texto da área de transferência">📋 Colar</button>
+          <button id="btn-select-all" class="btn btn-secondary" title="Selecionar todo o texto de entrada">🔍 Selecionar Entrada</button>
+          <button id="btn-start" class="btn btn-primary">Iniciar Simulação</button>
+          <button id="btn-instant" class="btn btn-warning" title="Processar instantaneamente sem animação de árvore">⚡ Executar Instantâneo</button>
+        </div>
+      </div>
+
+      <div class="stepper-controls">
+        <button id="btn-prev" class="btn btn-secondary" disabled>⏮ Passo Anterior</button>
+        <button id="btn-next" class="btn btn-success" disabled>⏭ Próximo Passo</button>
+        <button id="btn-auto" class="btn btn-warning" disabled>▶ Execução Automática</button>
+        <button id="btn-reset" class="btn btn-danger" disabled>🔄 Reiniciar</button>
+        <span id="step-counter" class="badge">Passo 0 / 0</span>
+      </div>
+    </section>
+
+    <!-- FAIXA DE TEXTO INTERATIVA (MINIMAPA DA FRASE) -->
+    <section class="card char-tracker-card" id="section-tracker">
+      <h2 id="tracker-title">2. Processamento Sequencial da Mensagem</h2>
+      <div id="char-tracker" class="char-tracker">
+        <span class="placeholder-text">Aguardando início da simulação...</span>
+      </div>
+    </section>
+
+    <!-- ÁREA VISUAL DA ÁRVORE COM ZOOM -->
+    <section class="card tree-card" id="section-tree">
+      <div class="tree-header">
+        <h2>3. Árvore Balanceada AVL (Navegação Interativa)</h2>
+        <div class="tree-tools">
+          <button id="btn-zoom-in" class="btn-tool">🔍 +</button>
+          <button id="btn-zoom-out" class="btn-tool">🔍 -</button>
+          <button id="btn-zoom-reset" class="btn-tool">🎯 Centralizar</button>
+        </div>
+      </div>
+      <p class="hint-text">💡 Dica: Clique e arraste com o mouse para mover a árvore. Use o scroll para dar zoom.</p>
+      
+      <div id="tree-container">
+        <svg id="tree-svg" width="100%" height="450"></svg>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot node-normal"></i> Nó Processado</span>
+        <span><i class="dot node-active"></i> Caractere Atual</span>
+        <span><i class="dot node-root"></i> Raiz Principal</span>
+      </div>
+    </section>
+
+    <!-- LOGS E SAÍDA -->
+    <section class="card log-card" id="section-logs">
+      <h2>4. Diagnóstico e Criptografia Em Tempo Real</h2>
+      
+      <div class="explanation-box">
+        <h3>Etapa Atual:</h3>
+        <p id="explanation-text">Digite a mensagem e clique em <strong>"Iniciar Simulação"</strong> ou <strong>"Executar Instantâneo"</strong>.</p>
+      </div>
+
+      <!-- DETALHAMENTO MATEMÁTICO DO CÁLCULO DA ETAPA -->
+      <div class="math-breakdown-box">
+        <h4>🧮 Detalhamento Matemático do Processamento:</h4>
+        <div id="math-details" class="mono math-details-content">
+          Aguardando início da simulação...
+        </div>
+      </div>
+
+      <div class="traversal-grid">
+        <div class="traversal-box">
+          <h4>Em-Ordem (Alfabetico/ASCII):</h4>
+          <div id="inorder-output" class="mono scroll-box">-</div>
+        </div>
+        <div class="traversal-box">
+          <h4>Pré-Ordem (Chave Gerada):</h4>
+          <div id="preorder-output" class="mono scroll-box">-</div>
+        </div>
+      </div>
+
+      <div class="result-box" id="section-result">
+        <div class="result-header">
+          <h4 id="result-label">Texto Cifrado Resultante:</h4>
+          <button id="btn-copy-result" class="btn btn-secondary btn-sm" disabled>📋 Copiar / Selecionar Resultado</button>
+        </div>
+        <div id="cipher-output" class="cipher-text">---</div>
+      </div>
+    </section>
+
+    <!-- ÁREA DE EXPORTAÇÃO E COMPARTILHAMENTO -->
+    <section class="card export-card" id="section-export">
+      <h2>5. Exportação e Compartilhamento</h2>
+      <p class="hint-text">Salve o resultado em arquivo físico (Pen Drive) ou compartilhe via redes sociais:</p>
+      <div class="export-buttons">
+        <button id="btn-download-file" class="btn btn-primary" disabled>💾 Salvar em Arquivo (.txt / Pen Drive)</button>
+        <button id="btn-share-whatsapp" class="btn btn-success" disabled>📲 Enviar via WhatsApp</button>
+        <button id="btn-share-email" class="btn btn-secondary" disabled>✉️ Enviar por E-mail</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
