@@ -18,7 +18,8 @@
     <section class="card control-panel" id="section-controls">
       <h2>1. Configuração da Mensagem (Até 100 caracteres)</h2>
       
-      <div class="mode-selector-group">
+      <!-- Modo de Operação Centralizado -->
+      <div class="mode-selector-group" style="justify-content: center;">
         <span class="mode-label">Modo de Operação:</span>
         <div class="segmented-control">
           <button type="button" class="btn-mode active" data-mode="encrypt">🔒 Criptografar</button>
@@ -26,20 +27,32 @@
         </div>
       </div>
 
+      <!-- CAMPO DE TEXTO DE PONTA A PONTA -->
+      <div class="input-full-container" style="margin-bottom: 12px;">
+        <input type="text" id="input-text" value="Estrutura de Dados #2026!" maxlength="100" placeholder="Digite caracteres, números ou texto cifrado Base64..." style="width: 100%; box-sizing: border-box; padding: 12px; font-size: 15px;">
+      </div>
+
+      <!-- BOTÕES DE AÇÃO CENTRALIZADOS LOGO ABAIXO -->
       <div class="input-group">
-        <div class="flex-row">
-          <input type="text" id="input-text" value="Estrutura de Dados #2026!" maxlength="100" placeholder="Digite caracteres, números ou texto cifrado Base64...">
+        <div class="flex-row" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
           <button id="btn-paste" class="btn btn-secondary" title="Colar texto da área de transferência">📋 Colar</button>
           
-          <input type="file" id="file-input" accept=".txt,.bat" style="display: none;" onchange="lerArquivo(event)">
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-input').click()">📁 Carregar Arquivo</button>  
-          <button id="btn-select-all" class="btn btn-secondary" title="Selecionar todo o texto de entrada">🔍 Selecionar Entrada</button>
+          <label for="file-input" class="btn btn-secondary" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0;">
+            📁 Carregar Arquivo
+            <input type="file" id="file-input" accept=".txt,.bat" style="display: none;" onchange="lerArquivo(event)">
+          </label>
+
+          <button id="btn-select-all" class="btn btn-secondary" title="Selecionar todo o texto de entrada">🔍 Selecionar</button>
+          
+          <button id="btn-clear-input" class="btn btn-danger" title="Limpar campo de mensagem">🧹 Limpar</button>
+
           <button id="btn-start" class="btn btn-primary">Iniciar Simulação</button>
           <button id="btn-instant" class="btn btn-warning" title="Processar instantaneamente sem animação de árvore">⚡ Executar Instantâneo</button>
         </div>
       </div>
 
-      <div class="stepper-controls">
+      <!-- CONTROLES DE PASSO A PASSO CENTRALIZADOS -->
+      <div class="stepper-controls" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px;">
         <button id="btn-prev" class="btn btn-secondary" disabled>⏮ Passo Anterior</button>
         <button id="btn-next" class="btn btn-success" disabled>⏭ Próximo Passo</button>
         <button id="btn-auto" class="btn btn-warning" disabled>▶ Execução Automática</button>
