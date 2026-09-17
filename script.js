@@ -825,3 +825,23 @@ function desenharNo(group, x, y, char, isActive, isRoot) {
   g.appendChild(text);
   group.appendChild(g);
 }
+
+// Função para carregar e ler o arquivo (.txt ou .bat)
+function lerArquivo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    const conteudo = e.target.result;
+    
+    // Insere o conteúdo do arquivo na caixa de texto do simulador
+    const inputArea = document.getElementById("input-text");
+    if (inputArea) {
+      inputArea.value = conteudo.trim();
+    }
+  };
+
+  reader.readAsText(file);
+}
