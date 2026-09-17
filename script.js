@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarPanAndZoom();
 });
 
-// LEITURA DE ARQUIVO FÍSICO (.txt / .bat) CONECTADA AO HTML
+// LEITURA DE ARQUIVO FÍSICO CORRIGIDA (.txt / .bat)
 function lerArquivo(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -200,7 +200,21 @@ function lerArquivo(event) {
   
   reader.onload = function(e) {
     try {
-      const conteudo = e.target.result;
+      let conteudo = e.target.result;
+
+      // Se for um arquivo .bat gerado pelo sistema, limpa os comandos do Windows e extrai só o hash
+      if (file.name.endsWith(".bat")) {
+        const linhas = conteudo.split("\n");
+        for (let linha of linhas) {
+          linha = linha.trim();
+          // Procura pela linha que contém o comando echo com o código cifrado real
+          if (linha.startsWith("echo ") && !linha.includes("Resultado Cifrado") && !linha.includes("off")) {
+            conteudo = linha.substring(5).trim();
+            break;
+          }
+        }
+      }
+
       const inputArea = document.getElementById("input-text");
       if (inputArea) {
         inputArea.value = conteudo.trim();
@@ -216,8 +230,6 @@ function lerArquivo(event) {
   };
 
   reader.readAsText(file);
-  
-  // Reseta o input para permitir reenvio do mesmo arquivo se necessário
   event.target.value = "";
 }
 
@@ -344,7 +356,6 @@ function iniciarSimulacao() {
   renderizarPassoAtual(false);
 }
 
-// PROCESSAMENTO INSTANTÂNEO COM ALERTA ÚNICO DE SUCESSO
 function executarInstantaneo() {
   const text = document.getElementById("input-text").value;
   if (!text.trim()) return;
@@ -661,10 +672,20 @@ function baixarArquivoFisico() {
   const resultText = document.getElementById("cipher-output").innerText;
   if (!resultText || resultText === "---") return;
 
-  const blob = new Blob([resultText], { type: "text/plain;charset=utf-8" });
+  const extSelect = document.getElementById("select-file-ext");
+  const ext = extSelect ? extSelect.value : "txt";
+
+  let dadosParaSalvar = resultText;
+  let nomeArquivo = `resultado_criptografado.${ext}`;
+
+  if (ext === "bat") {
+    dadosParaSalvar = `@echo off\n:: SecureCore Enterprise - Resultado AVL\necho Resultado Cifrado:\necho ${resultText}\necho.\npause`;
+  }
+
+  const blob = new Blob([dadosParaSalvar], { type: "text/plain;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "mensagem_criptografada_avl.txt";
+  link.download = nomeArquivo;
   link.click();
   URL.revokeObjectURL(link.href);
 }
@@ -749,7 +770,6 @@ SecureCore Enterprise Solutions`;
   }
 }
 
-// LÓGICA DE PAN & ZOOM NO SVG
 function configurarPanAndZoom() {
   const container = document.getElementById("tree-container");
   if (!container) return;
@@ -796,7 +816,6 @@ function atualizarTransformacaoSVG() {
   }
 }
 
-// DESENHO TIPO NÓ NA TELA
 function desenharSVG(root, activeChar) {
   const svg = document.getElementById("tree-svg");
   if (!svg) return;
