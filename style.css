@@ -51,11 +51,17 @@ header p { color: var(--text-muted); font-size: 0.9rem; }
   font-size: 1.1rem;
   color: var(--accent-cyan);
   margin-bottom: 15px;
+  text-align: center; /* Centraliza o título dos cards se preferir, ou remova */
+}
+
+.control-panel {
+  text-align: center;
 }
 
 .mode-selector-group {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
   margin-bottom: 15px;
   background-color: var(--bg-dark);
@@ -101,20 +107,36 @@ header p { color: var(--text-muted); font-size: 0.9rem; }
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
 }
 
-.flex-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.flex-row { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 15px; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+}
 
 input[type="text"] {
-  flex: 1;
-  min-width: 250px;
+  width: 100%;
   background-color: var(--bg-dark);
   border: 1px solid var(--border-color);
   color: #fff;
   padding: 12px 15px;
   border-radius: 6px;
   font-size: 1.05rem;
+  box-sizing: border-box;
 }
 
-.stepper-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.input-full-container {
+  margin-bottom: 15px;
+}
+
+.stepper-controls { 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+}
 
 .btn {
   padding: 10px 18px;
@@ -139,12 +161,12 @@ input[type="text"] {
 .btn-danger { background-color: #ef4444; color: #fff; }
 
 .badge {
-  margin-left: auto;
   background-color: var(--bg-dark);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.85rem;
   border: 1px solid var(--border-color);
+  margin-left: 0;
 }
 
 /* TRACKER DE CARACTERES */
@@ -202,7 +224,7 @@ input[type="text"] {
 
 #tree-container:active { cursor: grabbing; }
 
-.legend { display: flex; gap: 15px; margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); }
+.legend { display: flex; gap: 15px; margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); justify-content: center; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
 .node-normal { background-color: var(--accent-blue); }
 .node-active { background-color: var(--accent-green); }
@@ -278,4 +300,5 @@ input[type="text"] {
   gap: 15px;
   flex-wrap: wrap;
   margin-top: 10px;
+  justify-content: center;
 }
