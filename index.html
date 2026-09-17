@@ -133,8 +133,18 @@
     <section class="card export-card" id="section-export">
       <h2>5. Exportação e Compartilhamento</h2>
       <p class="hint-text">Salve o resultado em arquivo físico (Pen Drive) ou compartilhe via redes sociais:</p>
-      <div class="export-buttons">
-        <button id="btn-download-file" class="btn btn-primary" disabled>💾 Salvar em Arquivo (.txt / Pen Drive)</button>
+      
+      <div class="export-buttons" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <!-- Seletor de Extensão -->
+        <div class="select-wrapper" style="display: inline-flex; align-items: center; gap: 6px;">
+          <label for="select-file-ext" style="font-size: 14px; font-weight: 500;">Formato:</label>
+          <select id="select-file-ext" class="form-control" style="padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; background-color: #fff; cursor: pointer;">
+            <option value="txt">.txt (Texto Plano)</option>
+            <option value="bat">.bat (Script Windows)</option>
+          </select>
+        </div>
+
+        <button id="btn-download-file" class="btn btn-primary" disabled>💾 Salvar em Arquivo (Pen Drive)</button>
         <button id="btn-share-whatsapp" class="btn btn-success" disabled>📲 Enviar via WhatsApp</button>
         <button id="btn-share-email" class="btn btn-secondary" disabled>✉️ Enviar por E-mail</button>
       </div>
