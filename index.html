@@ -30,6 +30,9 @@
         <div class="flex-row">
           <input type="text" id="input-text" value="Estrutura de Dados #2026!" maxlength="100" placeholder="Digite caracteres, números ou texto cifrado Base64...">
           <button id="btn-paste" class="btn btn-secondary" title="Colar texto da área de transferência">📋 Colar</button>
+          
+          <input type="file" id="file-input" accept=".txt,.bat" style="display: none;" onchange="lerArquivo(event)">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-input').click()">📁 Carregar Arquivo</button>  
           <button id="btn-select-all" class="btn btn-secondary" title="Selecionar todo o texto de entrada">🔍 Selecionar Entrada</button>
           <button id="btn-start" class="btn btn-primary">Iniciar Simulação</button>
           <button id="btn-instant" class="btn btn-warning" title="Processar instantaneamente sem animação de árvore">⚡ Executar Instantâneo</button>
