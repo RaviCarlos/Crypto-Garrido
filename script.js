@@ -142,6 +142,16 @@ document.addEventListener("DOMContentLoaded", () => {
     reiniciar();
   });
 
+  // BOTÃO LIMPAR CAMPO DE ENTRADA
+  document.getElementById("btn-clear-input").addEventListener("click", (e) => {
+    e.preventDefault();
+    const inputArea = document.getElementById("input-text");
+    if (inputArea) {
+      inputArea.value = "";
+      inputArea.focus();
+    }
+  });
+
   // BOTÃO COLAR
   document.getElementById("btn-paste").addEventListener("click", async (e) => {
     e.preventDefault();
@@ -165,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-copy-result").addEventListener("click", (e) => {
     e.preventDefault();
-    selecionarECopiarResultado();
+    selecionarECopiarResultados();
   });
 
   // Botões de Exportação
@@ -181,50 +191,89 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarPanAndZoom();
 });
 
+// LEITURA DE ARQUIVO FÍSICO (.txt / .bat) CONECTADA AO HTML
+function lerArquivo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    try {
+      const conteudo = e.target.result;
+      const inputArea = document.getElementById("input-text");
+      if (inputArea) {
+        inputArea.value = conteudo.trim();
+        alert(`Arquivo "${file.name}" carregado com sucesso!`);
+      }
+    } catch (err) {
+      alert("Erro ao ler o conteúdo do arquivo.");
+    }
+  };
+
+  reader.onerror = function() {
+    alert("Erro: Falha ao carregar o arquivo.");
+  };
+
+  reader.readAsText(file);
+  
+  // Reseta o input para permitir reenvio do mesmo arquivo se necessário
+  event.target.value = "";
+}
+
 // ALGORITMO CRIPTOGRÁFICO DE DUPLA VIA
-function processarMensagemPython(input_text, mode = "encrypt") {
+function processarMensagemPython(input_text, mode = "encrypt", suppressErrors = false) {
   if (!input_text) return "";
 
   const seed_key = 2026;
   
   if (mode === "encrypt") {
-    const length = input_text.length;
-    let root = null;
-    
-    for (let idx = 0; idx < length; idx++) {
-      const node_key = (idx * 31 + seed_key) % 10007;
-      root = inserirAVL(root, input_text[idx], node_key, idx + 1);
+    try {
+      const length = input_text.length;
+      let root = null;
+      
+      for (let idx = 0; idx < length; idx++) {
+        const node_key = (idx * 31 + seed_key) % 10007;
+        root = inserirAVL(root, input_text[idx], node_key, idx + 1);
+      }
+
+      const pre_seq = [];
+      const post_seq = [];
+      obterPreOrdemChaves(root, pre_seq);
+      obterPosOrdemChaves(root, post_seq);
+
+      const encrypted_chars = [];
+      for (let i = 0; i < length; i++) {
+        const orig_char = input_text[i];
+        const pre_k = pre_seq[i % pre_seq.length];
+        const post_k = post_seq[i % post_seq.length];
+
+        const shift = (pre_k + post_k) % 256;
+        const encrypted_char = String.fromCharCode((orig_char.charCodeAt(0) + shift) % 1114112);
+        encrypted_chars.push(encrypted_char);
+      }
+
+      const raw_cipher = encrypted_chars.join("");
+      const encoder = new TextEncoder();
+      const byteArray = encoder.encode(raw_cipher);
+
+      let binaryString = "";
+      for (let i = 0; i < byteArray.length; i++) {
+        binaryString += String.fromCharCode(byteArray[i]);
+      }
+
+      return btoa(binaryString);
+    } catch (e) {
+      return "Erro ao criptografar dados!";
     }
-
-    const pre_seq = [];
-    const post_seq = [];
-    obterPreOrdemChaves(root, pre_seq);
-    obterPosOrdemChaves(root, post_seq);
-
-    const encrypted_chars = [];
-    for (let i = 0; i < length; i++) {
-      const orig_char = input_text[i];
-      const pre_k = pre_seq[i % pre_seq.length];
-      const post_k = post_seq[i % post_seq.length];
-
-      const shift = (pre_k + post_k) % 256;
-      const encrypted_char = String.fromCharCode((orig_char.charCodeAt(0) + shift) % 1114112);
-      encrypted_chars.push(encrypted_char);
-    }
-
-    const raw_cipher = encrypted_chars.join("");
-    const encoder = new TextEncoder();
-    const byteArray = encoder.encode(raw_cipher);
-
-    let binaryString = "";
-    for (let i = 0; i < byteArray.length; i++) {
-      binaryString += String.fromCharCode(byteArray[i]);
-    }
-
-    return btoa(binaryString);
   } else {
     try {
-      const binaryString = atob(input_text);
+      let cleanInput = input_text.trim();
+      while (cleanInput.length % 4 !== 0) {
+        cleanInput += '=';
+      }
+
+      const binaryString = atob(cleanInput);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
@@ -259,6 +308,9 @@ function processarMensagemPython(input_text, mode = "encrypt") {
 
       return decrypted_chars.join("");
     } catch (e) {
+      if (!suppressErrors) {
+        alert("Erro: O texto cifrado inserido é inválido, corrompido ou está mal formatado.");
+      }
       return "Erro: Código cifrado inválido!";
     }
   }
@@ -283,7 +335,6 @@ function iniciarSimulacao() {
   if (!text.trim()) return;
 
   pararAutoPlay();
-  
   gerarPassosSimulacao(text, currentMode);
   renderizarTracker(text);
 
@@ -293,7 +344,7 @@ function iniciarSimulacao() {
   renderizarPassoAtual(false);
 }
 
-// PROCESSAMENTO INSTANTÂNEO COM ROLAGEM AUTOMÁTICA
+// PROCESSAMENTO INSTANTÂNEO COM ALERTA ÚNICO DE SUCESSO
 function executarInstantaneo() {
   const text = document.getElementById("input-text").value;
   if (!text.trim()) return;
@@ -302,14 +353,21 @@ function executarInstantaneo() {
   gerarPassosSimulacao(text, currentMode);
   renderizarTracker(text);
 
-  // Define o estado no último passo
   stepIndex = currentSteps.length - 1;
   habilitarBotoes(true);
   resetarView();
   renderizarPassoAtual(false);
 
-  // Rola suavemente até o resultado final
-  document.getElementById("section-result").scrollIntoView({ behavior: "smooth", block: "center" });
+  if (currentMode === "encrypt") {
+    alert("🔒 Mensagem criptografada com sucesso!");
+  } else {
+    alert("🔓 Mensagem descriptografada com sucesso!");
+  }
+
+  const resultSection = document.getElementById("section-result") || document.getElementById("cipher-output");
+  if (resultSection) {
+    resultSection.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
 function gerarPassosSimulacao(text, mode) {
@@ -317,7 +375,7 @@ function gerarPassosSimulacao(text, mode) {
   let root = null;
   const seed_key = 2026;
 
-  const finalOutput = processarMensagemPython(text, mode);
+  const finalOutput = processarMensagemPython(text, mode, false);
   document.getElementById("result-label").innerText = mode === "encrypt" ? "Texto Cifrado Resultante:" : "Texto Original Descriptografado:";
 
   if (mode === "encrypt") {
@@ -406,15 +464,15 @@ function gerarPassosSimulacao(text, mode) {
       const shift = (preK + posK) % 256;
 
       const currentInputSlice = text.substring(0, i + 1);
-      const currentDecryptedText = processarMensagemPython(currentInputSlice, "decrypt");
+      const currentDecryptedText = processarMensagemPython(currentInputSlice, "decrypt", true);
 
       let newlyReconstructedChar = "";
-      if (currentDecryptedText.length > lastDecryptedLength) {
+      if (currentDecryptedText.length > lastDecryptedLength && !currentDecryptedText.startsWith("Erro")) {
         newlyReconstructedChar = currentDecryptedText.substring(lastDecryptedLength);
         lastDecryptedLength = currentDecryptedText.length;
       }
 
-      const displayReconstructed = newlyReconstructedChar
+      const displayReconstructed = newlyReconstructedChar && !currentDecryptedText.startsWith("Erro")
         ? `'<strong>${newlyReconstructedChar === " " ? "Espaço" : newlyReconstructedChar}</strong>'`
         : `<em>(Aguardando término do bloco Base64)</em>`;
 
@@ -465,6 +523,7 @@ function cloneTree(node) {
 
 function renderizarTracker(text) {
   const container = document.getElementById("char-tracker");
+  if (!container) return;
   container.innerHTML = "";
 
   for (let i = 0; i < text.length; i++) {
@@ -546,6 +605,11 @@ function alternarAutoPlay() {
         renderizarPassoAtual(false);
       } else {
         pararAutoPlay();
+        if (currentMode === "encrypt") {
+          alert("🔒 Mensagem criptografada com sucesso!");
+        } else {
+          alert("🔓 Mensagem descriptografada com sucesso!");
+        }
       }
     }, 700);
   }
@@ -577,7 +641,7 @@ function habilitarBotoes(status) {
   document.getElementById("btn-share-email").disabled = !status;
 }
 
-function selecionarECopiarResultado() {
+function selecionarECopiarResultados() {
   const cipherDiv = document.getElementById("cipher-output");
   const range = document.createRange();
   range.selectNodeContents(cipherDiv);
@@ -674,16 +738,12 @@ Atenciosamente,
 Equipe de Segurança da Informação
 SecureCore Enterprise Solutions`;
 
-  // 1. Método Nativo e Simplificado (Web Share API)
   if (navigator.share) {
     navigator.share({
       title: subject,
       text: body
-    }).catch(() => {
-      // Caso o usuário cancele a janela de compartilhamento
-    });
+    }).catch(() => {});
   } else {
-    // 2. Fallback simples para navegadores antigos
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
   }
@@ -692,6 +752,7 @@ SecureCore Enterprise Solutions`;
 // LÓGICA DE PAN & ZOOM NO SVG
 function configurarPanAndZoom() {
   const container = document.getElementById("tree-container");
+  if (!container) return;
 
   container.addEventListener("mousedown", (e) => {
     isDragging = true;
@@ -738,6 +799,7 @@ function atualizarTransformacaoSVG() {
 // DESENHO TIPO NÓ NA TELA
 function desenharSVG(root, activeChar) {
   const svg = document.getElementById("tree-svg");
+  if (!svg) return;
   svg.innerHTML = "";
 
   if (!root) return;
@@ -824,24 +886,4 @@ function desenharNo(group, x, y, char, isActive, isRoot) {
   g.appendChild(circle);
   g.appendChild(text);
   group.appendChild(g);
-}
-
-// Função para carregar e ler o arquivo (.txt ou .bat)
-function lerArquivo(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  
-  reader.onload = function(e) {
-    const conteudo = e.target.result;
-    
-    // Insere o conteúdo do arquivo na caixa de texto do simulador
-    const inputArea = document.getElementById("input-text");
-    if (inputArea) {
-      inputArea.value = conteudo.trim();
-    }
-  };
-
-  reader.readAsText(file);
 }
